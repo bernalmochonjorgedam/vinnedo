@@ -2,15 +2,17 @@ package com.utad.vinned.controller;
 
 import com.utad.vinned.dto.PlotDTO;
 import com.utad.vinned.service.PlotService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/plots")
 public class PlotController {
+
     @Autowired
     private PlotService plotService;
 
@@ -19,18 +21,14 @@ public class PlotController {
         return plotService.getAllPlots();
     }
 
-    @GetMapping("/{id}")
-    public Optional<PlotDTO> getPlotById(@PathVariable Long id) {
-        return plotService.getPlotById(id);
-    }
-
     @PostMapping
-    public PlotDTO createPlot(@RequestBody PlotDTO plotDTO) {
-        return plotService.createPlot(plotDTO);
+    public ResponseEntity<PlotDTO> createPlot(@Valid @RequestBody PlotDTO plotDTO) {
+        return ResponseEntity.ok(plotService.createPlot(plotDTO));
     }
 
     @DeleteMapping("/{id}")
-    public void deletePlot(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePlot(@PathVariable Long id) {
         plotService.deletePlot(id);
+        return ResponseEntity.noContent().build();
     }
 }

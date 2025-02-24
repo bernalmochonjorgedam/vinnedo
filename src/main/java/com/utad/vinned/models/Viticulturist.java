@@ -1,7 +1,10 @@
 package com.utad.vinned.models;
 
+import com.utad.vinned.models.Plot;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,5 +18,10 @@ public class Viticulturist {
     private Long id;
 
     private String name;
-    private String phone;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @OneToMany(mappedBy = "viticulturist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Plot> plots = new ArrayList<>();
 }

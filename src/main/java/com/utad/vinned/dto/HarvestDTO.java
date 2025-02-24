@@ -1,5 +1,7 @@
 package com.utad.vinned.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -8,7 +10,13 @@ import lombok.*;
 @AllArgsConstructor
 public class HarvestDTO {
     private Long id;
-    private Long plantationId;
+
+    @NotBlank(message = "Harvest date is required")
     private String dateHarvest;
+
+    @NotNull(message = "Quantity in kg is required")
     private double quantityKg;
+
+    @NotNull(message = "Plantation ID is required")
+    private Long plantationId;
 }

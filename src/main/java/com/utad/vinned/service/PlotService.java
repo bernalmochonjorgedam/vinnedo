@@ -3,18 +3,22 @@ package com.utad.vinned.service;
 import com.utad.vinned.dto.PlotDTO;
 import com.utad.vinned.mapper.PlotMapper;
 import com.utad.vinned.models.Plot;
+import com.utad.vinned.models.Viticulturist;
 import com.utad.vinned.repository.PlotRepository;
+import com.utad.vinned.repository.ViticulturistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class PlotService {
     @Autowired
     private PlotRepository plotRepository;
+
+    @Autowired
+    private ViticulturistRepository viticulturistRepository;
 
     @Autowired
     private PlotMapper plotMapper;
@@ -25,20 +29,19 @@ public class PlotService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<PlotDTO> getPlotById(Long id) {
-        return plotRepository.findById(id).map(plotMapper::toDTO);
-    }
-
-    public PlotDTO createPlot(PlotDTO plotDTO) {
-        Plot plot = new Plot();
-        plot.setName(plotDTO.getName());
-        plot.setSizeHectares(plotDTO.getSizeHectares());
-        plot.setLocation(plotDTO.getLocation());
-        Plot savedPlot = plotRepository.save(plot);
-        return plotMapper.toDTO(savedPlot);
+    public PlotDTO createPlot(PlotDTO dto) {
+        Viticulturist viticulturist = viticulturistRepository.findById(dto.getViticulturistId())
+                .orElseThrow(() -> new RuntimeException("Viticulturist not found with ID: " + dto.getViticulturistId()));
+        Plot plot = plotMapper.toEntity(dto);
+        plot.setViticulturist(viticulturist);
+        plotRepository.save(plot);
+        return plotMapper.toDTO(plot);
     }
 
     public void deletePlot(Long id) {
-        plotRepository.deleteById(id);
+        Plot plot = plotRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Plot not found"));
+
+        plotRepository.delete(plot);
     }
 }

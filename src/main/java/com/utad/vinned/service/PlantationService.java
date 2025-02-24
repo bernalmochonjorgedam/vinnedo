@@ -3,18 +3,23 @@ package com.utad.vinned.service;
 import com.utad.vinned.dto.PlantationDTO;
 import com.utad.vinned.mapper.PlantationMapper;
 import com.utad.vinned.models.Plantation;
+import com.utad.vinned.models.Plot;
 import com.utad.vinned.repository.PlantationRepository;
+import com.utad.vinned.repository.PlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class PlantationService {
+
     @Autowired
     private PlantationRepository plantationRepository;
+
+    @Autowired
+    private PlotRepository plotRepository;
 
     @Autowired
     private PlantationMapper plantationMapper;
@@ -25,19 +30,21 @@ public class PlantationService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<PlantationDTO> getPlantationById(Long id) {
-        return plantationRepository.findById(id).map(plantationMapper::toDTO);
-    }
+    public PlantationDTO createPlantation(PlantationDTO dto) {
+        Plot plot = plotRepository.findById(dto.getPlotId())
+                .orElseThrow(() -> new RuntimeException("Plot not found"));
 
-    public PlantationDTO createPlantation(PlantationDTO plantationDTO) {
-        Plantation plantation = new Plantation();
-        plantation.setGrapeVariety(plantationDTO.getGrapeVariety());
-        plantation.setDatePlantation(plantationDTO.getDatePlantation());
-        Plantation savedPlantation = plantationRepository.save(plantation);
-        return plantationMapper.toDTO(savedPlantation);
+        Plantation plantation = plantationMapper.toEntity(dto);
+        plantation.setPlot(plot);
+
+        plantationRepository.save(plantation);
+        return plantationMapper.toDTO(plantation);
     }
 
     public void deletePlantation(Long id) {
-        plantationRepository.deleteById(id);
+        Plantation plantation = plantationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Plantation not found"));
+        plantationRepository.delete(plantation);
     }
+
 }

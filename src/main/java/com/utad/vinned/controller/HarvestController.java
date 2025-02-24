@@ -1,15 +1,19 @@
 package com.utad.vinned.controller;
 
 import com.utad.vinned.dto.HarvestDTO;
+import com.utad.vinned.dto.CollectedHarvestDTO;
 import com.utad.vinned.service.HarvestService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
 @RestController
 @RequestMapping("/harvests")
 public class HarvestController {
+
     @Autowired
     private HarvestService harvestService;
 
@@ -18,18 +22,14 @@ public class HarvestController {
         return harvestService.getAllHarvests();
     }
 
-    @GetMapping("/{id}")
-    public Optional<HarvestDTO> getHarvestById(@PathVariable Long id) {
-        return harvestService.getHarvestById(id);
-    }
-
     @PostMapping
-    public HarvestDTO createHarvest(@RequestBody HarvestDTO harvestDTO) {
-        return harvestService.createHarvest(harvestDTO);
+    public ResponseEntity<HarvestDTO> createHarvest(@Valid @RequestBody HarvestDTO harvestDTO) {
+        return ResponseEntity.ok(harvestService.createHarvest(harvestDTO));
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteHarvest(@PathVariable Long id) {
-        harvestService.deleteHarvest(id);
+    @PutMapping("/{harvestId}/collect/{viticulturistId}")
+    public ResponseEntity<CollectedHarvestDTO> collectHarvest(@PathVariable Long harvestId, @PathVariable Long viticulturistId) {
+        CollectedHarvestDTO collectedHarvest = harvestService.collectHarvest(harvestId, viticulturistId);
+        return ResponseEntity.ok(collectedHarvest);
     }
 }

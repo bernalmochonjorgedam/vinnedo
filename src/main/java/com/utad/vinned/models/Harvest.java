@@ -14,10 +14,10 @@ public class Harvest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "plantation_id")
-    private Plantation plantation;
-
     private String dateHarvest;
     private double quantityKg;
+
+    @ManyToOne
+    @JoinColumn(name = "plantation_id", nullable = false)
+    private Plantation plantation;
 }
